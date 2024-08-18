@@ -47,9 +47,16 @@ def client():
         except Exception as er:
             print(f"An error occurred: {er}")
             await session.rollback()
+            raise
         finally:
             await session.close()
 
     app.dependency_overrides[get_db] = override_get_db
 
     yield TestClient(app)
+
+
+@pytest_asyncio.fixture()
+async def get_token():
+    token = await auth_service.create_access_token(data={"sub": test_user["email"]})
+    return token

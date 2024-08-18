@@ -42,9 +42,10 @@ app.add_middleware(
 #     return response
 
 
-BASE_DIR = Path(".")
+BASE_DIR = Path(__file__).parent
+directory = BASE_DIR.joinpath("src").joinpath("static")
 
-app.mount("/static", StaticFiles(directory=BASE_DIR / "src" / "static"), name="static")
+app.mount("/static", StaticFiles(directory=directory), name="static")
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(contacts.router, prefix="/api")
@@ -79,6 +80,17 @@ def index(request: Request):
 
 @app.get("/api/healthchecker")
 async def healthchecker(db: AsyncSession = Depends(get_db)):
+    """
+    Health Check API.
+    This API checks if the database is running and accessible.
+
+    params:
+    db: SQLAlchemy AsyncSession: The database session to be used for the query.
+
+    Returns:
+        dict: A dictionary with a message indicating the health status.
+        If the database is not accessible, it will return an error message.
+    """
     try:
         # Make request
 
